@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Loose root media files
+/*.mp3
+/*.wav
+

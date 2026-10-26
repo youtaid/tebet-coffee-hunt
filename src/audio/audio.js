@@ -1,12 +1,13 @@
-// Audio sintetis ringan via Web Audio API — tidak butuh file aset.
+// Sistem audio: SFX sintetis via Web Audio API + BGM dari file audio (MP3).
 import { GAME } from '../config/gameConfig.js';
+import bgmUrl from '../assets/audio/bgm.mp3';
 
 let ctx = null;
 let master = null;
 let musicGain = null;
 let sfxGain = null;
-let musicNodes = [];
-let musicTimer = null;
+let bgmAudio = null;
+let bgmSourceNode = null;
 
 const prefs = { music: true, sfx: true };
 try {
@@ -27,10 +28,35 @@ export function ensureAudio() {
   return ctx;
 }
 
+function initBgm() {
+  if (bgmAudio) return bgmAudio;
+  bgmAudio = new Audio(bgmUrl);
+  bgmAudio.loop = true;
+  bgmAudio.preload = 'auto';
+
+  if (ctx && musicGain && !bgmSourceNode) {
+    try {
+      bgmSourceNode = ctx.createMediaElementSource(bgmAudio);
+      bgmSourceNode.connect(musicGain);
+      bgmAudio.volume = 1;
+    } catch {
+      bgmAudio.volume = prefs.music ? GAME.audio.music : 0;
+    }
+  } else {
+    bgmAudio.volume = prefs.music ? GAME.audio.music : 0;
+  }
+  return bgmAudio;
+}
+
 export const audioPrefs = () => ({ ...prefs });
 export function toggleMusic() {
   prefs.music = !prefs.music; savePrefs();
-  if (musicGain) musicGain.gain.setTargetAtTime(prefs.music ? GAME.audio.music : 0, ctx.currentTime, 0.1);
+  if (musicGain && ctx) {
+    musicGain.gain.setTargetAtTime(prefs.music ? GAME.audio.music : 0, ctx.currentTime, 0.05);
+  }
+  if (bgmAudio && !bgmSourceNode) {
+    bgmAudio.volume = prefs.music ? GAME.audio.music : 0;
+  }
   if (prefs.music) startMusic(); else stopMusic();
   return prefs.music;
 }
@@ -94,24 +120,30 @@ export const sfx = {
   go() { ensureAudio(); tone({ freq: 880, dur: 0.5, vol: 0.4 }); },
 };
 
-// Musik lo-fi sederhana: pad akor berganti + kick lembut.
-const CHORDS = [[220, 277, 330], [196, 247, 294], [174, 220, 262], [165, 208, 247]];
+// Pemutaran musik latar belakang (BGM)
 export function startMusic() {
   ensureAudio();
-  if (!ctx || !prefs.music || musicTimer) return;
-  let i = 0;
-  const play = () => {
-    const chord = CHORDS[i % CHORDS.length]; i++;
-    chord.forEach((f) => tone({ freq: f, type: 'triangle', dur: 3.8, vol: 0.12, out: musicGain }));
-    tone({ freq: chord[0] / 2, type: 'sine', dur: 3.8, vol: 0.15, out: musicGain });
-    for (let k = 0; k < 4; k++) tone({ freq: 70, type: 'sine', dur: 0.2, vol: 0.18, delay: k * 1.0, slide: -40, out: musicGain });
-  };
-  play();
-  musicTimer = setInterval(play, 4000);
+  if (!prefs.music) return;
+  const audio = initBgm();
+  if (ctx && musicGain && !bgmSourceNode) {
+    try {
+      bgmSourceNode = ctx.createMediaElementSource(audio);
+      bgmSourceNode.connect(musicGain);
+      audio.volume = 1;
+    } catch {
+      audio.volume = prefs.music ? GAME.audio.music : 0;
+    }
+  }
+  if (audio.paused) {
+    const p = audio.play();
+    if (p !== undefined) {
+      p.catch(() => { /* Akan play otomatis saat interaksi berikutnya */ });
+    }
+  }
 }
+
 export function stopMusic() {
-  if (musicTimer) clearInterval(musicTimer);
-  musicTimer = null;
-  musicNodes.forEach((n) => { try { n.stop(); } catch { /* ignore */ } });
-  musicNodes = [];
+  if (bgmAudio) {
+    bgmAudio.pause();
+  }
 }
