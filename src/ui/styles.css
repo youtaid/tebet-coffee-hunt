@@ -29,11 +29,11 @@ h1, h2, h3 { font-family: var(--font-h); margin: 0; letter-spacing: .02em; }
 
 /* ---------- full screens ---------- */
 .screen { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; animation: fade .4s var(--ease); }
-.screen.dim { background: rgba(10, 16, 30, .55); backdrop-filter: blur(4px); }
+.screen.dim { background: rgba(10, 16, 30, .55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
 .screen.solid { background: linear-gradient(160deg, #15213a, #0f1626); }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes pop { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
-.panel { background: var(--glass); border: 1px solid var(--line); border-radius: 22px; padding: 28px 30px; max-width: 560px; width: 100%; backdrop-filter: blur(14px); box-shadow: 0 24px 60px rgba(0,0,0,.35); animation: pop .4s var(--ease); }
+.panel { background: var(--glass); border: 1px solid var(--line); border-radius: 22px; padding: 28px 30px; max-width: 560px; width: 100%; -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: 0 24px 60px rgba(0,0,0,.35); animation: pop .4s var(--ease); }
 .panel.wide { max-width: 760px; }
 .eyebrow { font-family: var(--font-h); font-size: 12px; letter-spacing: .22em; color: var(--teal2); text-transform: uppercase; }
 .title { font-size: clamp(28px, 5vw, 52px); line-height: 1; margin: 6px 0; }
@@ -104,7 +104,7 @@ h1, h2, h3 { font-family: var(--font-h); margin: 0; letter-spacing: .02em; }
 @keyframes pulse { 0%,100% { transform: scale(1) } 50% { transform: scale(1.04) } }
 
 /* ---------- mission panel ---------- */
-.mission { position: absolute; right: 16px; top: 72px; bottom: 90px; width: min(460px, calc(100% - 32px)); background: var(--glass); border: 1px solid var(--line); border-radius: 20px; padding: 22px 22px 18px; backdrop-filter: blur(14px); overflow: auto; animation: pop .4s var(--ease); display: flex; flex-direction: column; gap: 12px; }
+.mission { position: absolute; right: 16px; top: 72px; bottom: 90px; width: min(460px, calc(100% - 32px)); background: var(--glass); border: 1px solid var(--line); border-radius: 20px; padding: 22px 22px 18px; -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); overflow: auto; animation: pop .4s var(--ease); display: flex; flex-direction: column; gap: 12px; }
 .mission .head .title { font-size: 26px; }
 .mission .narr { color: rgba(246,239,227,.82); font-size: 14px; line-height: 1.5; margin: 0; }
 .chips { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -135,7 +135,7 @@ h1, h2, h3 { font-family: var(--font-h); margin: 0; letter-spacing: .02em; }
 .note { font-size: 12px; color: rgba(246,239,227,.7); margin: 0; }
 
 /* ---------- toasts & modals ---------- */
-.toast { position: absolute; left: 50%; top: 80px; transform: translateX(-50%); background: var(--glass); border: 1px solid var(--line); border-radius: 16px; padding: 14px 22px; text-align: center; backdrop-filter: blur(12px); animation: pop .3s var(--ease); min-width: 280px; z-index: 5; }
+.toast { position: absolute; left: 50%; top: 80px; transform: translateX(-50%); background: var(--glass); border: 1px solid var(--line); border-radius: 16px; padding: 14px 22px; text-align: center; -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); animation: pop .3s var(--ease); min-width: 280px; z-index: 5; }
 .toast h3 { font-size: 18px; letter-spacing: .1em; }
 .toast p { margin: 4px 0 0; font-size: 13px; color: rgba(246,239,227,.8); }
 .toast.ok { border-color: rgba(76,175,80,.7); box-shadow: 0 0 30px rgba(76,175,80,.3); } .toast.ok h3 { color: #8ee28f; }
@@ -148,7 +148,7 @@ h1, h2, h3 { font-family: var(--font-h); margin: 0; letter-spacing: .02em; }
 @keyframes digit { 0% { transform: scale(.2); opacity: 0 } 30% { transform: scale(1.1); opacity: 1 } 70% { transform: scale(1); opacity: 1 } 100% { transform: translateY(42vh) scale(.15); opacity: 0 } }
 .nextstop { position: absolute; left: 50%; bottom: 100px; transform: translateX(-50%); background: var(--navy); border: 2px solid var(--yellow); color: var(--yellow); padding: 10px 24px; border-radius: 12px; font-family: var(--font-h); font-weight: 700; letter-spacing: .14em; text-align: center; animation: pop .4s var(--ease); }
 .nextstop small { display: block; font-size: 10px; letter-spacing: .3em; color: var(--cream); }
-.modal { background: var(--glass); border: 1px solid var(--line); border-radius: 18px; padding: 22px; max-width: 420px; width: 100%; backdrop-filter: blur(14px); animation: pop .3s var(--ease); }
+.modal { background: var(--glass); border: 1px solid var(--line); border-radius: 18px; padding: 22px; max-width: 420px; width: 100%; -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); animation: pop .3s var(--ease); }
 .modal h3 { font-size: 18px; margin-bottom: 8px; }
 .modal p { margin: 0 0 14px; font-size: 14px; line-height: 1.5; }
 .hintlist { display: grid; gap: 8px; margin-bottom: 12px; }
@@ -157,7 +157,7 @@ h1, h2, h3 { font-family: var(--font-h); margin: 0; letter-spacing: .02em; }
 .hintitem .pen { font-family: var(--font-h); color: var(--yellow); font-size: 12px; white-space: nowrap; }
 
 /* ---------- vault ---------- */
-.vaultpanel { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); width: min(400px, calc(100% - 32px)); background: var(--glass); border: 1px solid var(--line); border-radius: 20px; padding: 20px 26px; text-align: center; backdrop-filter: blur(14px); animation: pop .4s var(--ease); }
+.vaultpanel { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); width: min(400px, calc(100% - 32px)); background: var(--glass); border: 1px solid var(--line); border-radius: 20px; padding: 20px 26px; text-align: center; -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); animation: pop .4s var(--ease); }
 .pininputs { display: flex; gap: 10px; justify-content: center; margin: 14px 0; }
 .pininputs input { width: 62px; height: 76px; border-radius: 14px; border: 2px solid var(--line); background: rgba(255,255,255,.08); color: var(--cream); font: 700 38px var(--font-h); text-align: center; }
 .pininputs.deny input { border-color: var(--red); background: rgba(224,82,82,.2); animation: shakeX .4s; }
