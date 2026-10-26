@@ -17,13 +17,12 @@ export function showHud() {
   refs.pen = el('span.pen', {}, '');
   refs.hint = el('span', {}, '0');
   refs.music = el('button', { class: prefs.music ? 'on' : '', 'aria-label': 'Music on/off', title: 'Music', onclick: () => { const on = toggleMusic(); refs.music.classList.toggle('on', on); } }, '♫');
-  refs.sfxb = el('button', { class: prefs.sfx ? 'on' : '', 'aria-label': 'SFX on/off', title: 'SFX', onclick: () => { const on = toggleSfx(); refs.sfxb.classList.toggle('on', on); } }, '🔊');
   refs.hintBtn = el('button.hintbtn', { 'aria-label': 'Gunakan hint', onclick: () => { sfx.click(); onHint && onHint(); } }, '💡 HINT');
   refs.slots = ['A', 'B', 'C', 'D'].map((k) => el('div.slot', { 'aria-label': `Digit ${k}`, 'data-k': k }, '?'));
   hud = el('div#hud',
     el('div.chip.left', el('small', {}, 'MISSION'), refs.mission),
     el('div.chip.center', el('small', {}, 'TIME'), refs.timer, refs.pen),
-    el('div.chip.right', el('small', {}, 'HINT'), refs.hint, refs.hintBtn, refs.music, refs.sfxb),
+    el('div.chip.right', el('small', {}, 'HINT'), refs.hint, refs.hintBtn, refs.music),
     el('div.pinhud', { 'aria-label': 'Secret PIN' }, el('small', {}, 'SECRET PIN'), ...refs.slots),
   );
   document.body.append(hud);
