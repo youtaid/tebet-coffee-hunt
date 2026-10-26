@@ -235,15 +235,136 @@ export function resultScreen({ stars, score, achievements, onLeaderboard, onRest
 }
 
 export async function leaderboardScreen({ me, onBack }) {
-  const rows = await leaderboard.list(10);
-  const medal = ['🥇', '🥈', '🥉'];
-  mount(el('div.screen.dim', el('div.panel.wide',
-    el('div.eyebrow', {}, 'LEADERBOARD'),
-    el('h2.title', { style: 'font-size:30px' }, 'TOP TEAMS'),
-    rows.length ? el('table.lb', el('thead', el('tr', ...['Rank', 'Team', 'Time', 'Hints', 'Attempts', 'Score'].map((h) => el('th', {}, h)))),
-      el('tbody', ...rows.map((r, i) => el('tr', { class: me && r.id === me ? 'me' : '' }, el('td', {}, medal[i] || `${i + 1}`), el('td', {}, r.team), el('td', {}, fmtTime(r.time)), el('td', {}, r.hints), el('td', {}, r.attempts), el('td', {}, r.score.toLocaleString('id-ID'))))))
-      : el('p.sub', {}, 'Belum ada tim yang menyelesaikan tantangan.'),
-    el('div.row', el('button.btn', { onclick: () => { sfx.click(); onBack(); } }, 'PLAY AGAIN')),
+  let currentFilter = 'top10';
+  let searchQuery = '';
+
+  const stats = await leaderboard.getStats();
+
+  const statsBar = el('div.lb-stats',
+    el('div.lb-stat-item',
+      el('span.k', {}, '👥 TOTAL TIM'),
+      el('span.v', {}, String(stats.totalTeams || 0))
+    ),
+    el('div.lb-stat-item',
+      el('span.k', {}, '⚡ TERCEPAT'),
+      el('span.v', {}, stats.fastestTime ? fmtTime(stats.fastestTime) : '—')
+    ),
+    el('div.lb-stat-item',
+      el('span.k', {}, '🏆 SKOR TERTINGGI'),
+      el('span.v.gold', {}, stats.topScore ? stats.topScore.toLocaleString('id-ID') : '—')
+    )
+  );
+
+  const searchInput = el('input.lb-search', {
+    type: 'text',
+    placeholder: '🔍 Cari nama tim...',
+    value: '',
+    oninput: (e) => {
+      searchQuery = e.target.value;
+      updateTable();
+    }
+  });
+
+  const btnTop10 = el('button.btn.sm', {
+    class: 'on',
+    onclick: () => {
+      currentFilter = 'top10';
+      btnTop10.classList.add('on');
+      btnAll.classList.remove('on');
+      updateTable();
+    }
+  }, 'TOP 10');
+
+  const btnAll = el('button.btn.ghost.sm', {
+    onclick: () => {
+      currentFilter = 'all';
+      btnAll.classList.add('on');
+      btnTop10.classList.remove('on');
+      updateTable();
+    }
+  }, 'SEMUA TIM');
+
+  const btnExport = el('button.btn.ghost.sm.lb-export', {
+    onclick: () => {
+      sfx.click();
+      leaderboard.exportCSV();
+    },
+    title: 'Download file CSV untuk Excel atau Google Sheets'
+  }, '📥 EXPORT CSV');
+
+  const tableContainer = el('div.lb-table-wrap');
+
+  async function updateTable() {
+    const limit = currentFilter === 'top10' ? 10 : 200;
+    const rows = await leaderboard.list({ limit, search: searchQuery });
+    const medal = ['🥇', '🥈', '🥉'];
+
+    if (!rows.length) {
+      tableContainer.replaceChildren(
+        el('div.lb-empty', {}, searchQuery ? `Tidak ditemukan tim dengan kata kunci "${searchQuery}"` : 'Belum ada data tim.')
+      );
+      return;
+    }
+
+    const starIcons = (num) => '⭐'.repeat(Math.max(1, Math.min(3, num || 1)));
+
+    const trs = rows.map((r, i) => {
+      const isMe = me && r.id === me;
+      const rankBadge = medal[i] || `#${i + 1}`;
+      return el('tr', { class: isMe ? 'me' : '' },
+        el('td.td-rank', {}, rankBadge),
+        el('td.td-team', {},
+          el('span.team-name', {}, r.team || 'Anonim'),
+          isMe ? el('span.badge-you', {}, 'KAMU') : null
+        ),
+        el('td.td-stars', {}, starIcons(r.stars)),
+        el('td.td-time', {}, fmtTime(r.time)),
+        el('td.td-hints', {}, String(r.hints ?? 0)),
+        el('td.td-doorprize', {}, r.doorprize ? `🎁 ${r.doorprize}` : '—'),
+        el('td.td-score', {}, el('strong', {}, (r.score || 0).toLocaleString('id-ID')))
+      );
+    });
+
+    const table = el('table.lb',
+      el('thead', el('tr',
+        el('th', {}, 'RANK'),
+        el('th', {}, 'TIM'),
+        el('th', {}, 'RATING'),
+        el('th', {}, 'WAKTU'),
+        el('th', {}, 'HINT'),
+        el('th', {}, 'HADIAH'),
+        el('th', { style: 'text-align:right' }, 'SKOR')
+      )),
+      el('tbody', ...trs)
+    );
+
+    tableContainer.replaceChildren(table);
+
+    if (me) {
+      setTimeout(() => {
+        const myRow = table.querySelector('tr.me');
+        if (myRow) myRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+    }
+  }
+
+  updateTable();
+
+  mount(el('div.screen.dim', el('div.panel.wide.lb-panel',
+    el('div.eyebrow', {}, '🏆 LEADERBOARD'),
+    el('h2.title', { style: 'font-size:28px' }, 'TEBET COFFEE HUNT'),
+    el('p.sub', { style: 'margin-bottom:12px' }, 'Peringkat Tim & Catatan Waktu Tercepat'),
+    statsBar,
+    el('div.lb-toolbar',
+      searchInput,
+      el('div.lb-filter-group', btnTop10, btnAll),
+      btnExport
+    ),
+    tableContainer,
+    el('div.row.lb-footer',
+      el('button.btn', { onclick: () => { sfx.click(); onBack(); } }, 'PLAY AGAIN'),
+      el('button.btn.ghost.sm', { onclick: () => { sfx.click(); updateTable(); } }, '🔄 REFRESH')
+    )
   )));
 }
 

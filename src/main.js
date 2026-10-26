@@ -205,8 +205,18 @@ async function result() {
   s.gameCompleted = true; s.phase = 'result'; store.emit(); store.clearSave();
   const stars = computeStars(s); const score = computeScore(s); const ach = computeAchievements(s);
   s.achievements = ach.map((a) => a.id);
-  const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-  await leaderboard.submit({ id, team: s.teamName, time: Math.round(s.baseTime + s.penaltyTime), hints: s.hintCount, attempts: s.vaultAttempts, score, stars, date: new Date().toISOString() });
+  await leaderboard.submit({
+    id,
+    team: s.teamName,
+    time: Math.round(s.baseTime + s.penaltyTime),
+    hints: s.hintCount,
+    attempts: s.vaultAttempts,
+    score,
+    stars,
+    doorprize: s.doorprize || 'Coffee Finisher',
+    achievements: s.achievements,
+    date: new Date().toISOString()
+  });
   hideHud();
   S.resultScreen({ stars, score, achievements: ach, onLeaderboard: () => S.leaderboardScreen({ me: id, onBack: restart }), onRestart: restart });
 }

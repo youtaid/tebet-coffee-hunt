@@ -43,7 +43,12 @@ function render() {
     el('div.eyebrow', {}, 'STATUS TIM'), status,
     el('div.row', btn(s.timerRunning ? 'PAUSE TIMER' : 'RESUME TIMER', () => actions.toggleTimer && actions.toggleTimer()), btn('+30s PENALTY', () => actions.penalty && actions.penalty(30)), btn('RESTART GAME', () => actions.restart && actions.restart(), 'btn sm')),
     el('div.eyebrow.mt', {}, 'MISSION CONTROL'), ...missionBtns,
-    el('div.row.mt', btn('GO TO VAULT', () => actions.gotoVault && actions.gotoVault()), btn('CLEAR LEADERBOARD', () => leaderboard.clear())),
+    el('div.row.mt',
+      btn('GO TO VAULT', () => actions.gotoVault && actions.gotoVault()),
+      btn('EXPORT CSV', () => leaderboard.exportCSV()),
+      btn('RESET SEED', () => leaderboard.reset()),
+      btn('CLEAR LB', () => leaderboard.clear())
+    ),
     el('div.eyebrow.mt', {}, 'KUNCI JAWABAN'), answersTable,
     el('p.note', {}, `Penalti hint: +${GAME.penalties.hint.join(' / +')}s · PIN salah: +${GAME.penalties.wrongVault}s`),
   );
